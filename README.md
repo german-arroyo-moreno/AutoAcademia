@@ -12,7 +12,7 @@ The execute from your favourite console and some help will be displayed:
 
 *python3 academia.py --help*
 
-**
+
 usage: academia.py [-h] [-hd HEADER] [-ft FOOTER] [-t TEMPLATE] [-tk TOKENS]
                    [-rules PRERERULES] [--append] [-o OUTPUT] [-m {plain,tex}]
                    [-c]
@@ -41,4 +41,3 @@ optional arguments:
   -m {plain,tex}, --mode {plain,tex}
                         Replacement mode.
   -c, --colors          For terminals with colors.
-**
