@@ -8,7 +8,7 @@ The software allows you to insert a header and a footer, and it is able to deal 
 An example is provided in the folder **example** for LaTeX and HTML output.
 
 A good start point is installing python3 (no other dependencies are required).
-The execute from your favourite console and some help will be displayed:
+Then execute from your favourite console and some help will be displayed:
 
 \# *python3 academia.py --help*
 
