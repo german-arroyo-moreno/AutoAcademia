@@ -1,0 +1,24 @@
+---
+
+-- this is a comment
+(
+authors: Domingo Martín, Germán Arroyo, Alejandro Rodríguez, Tobias Isenberg
+title: A Survey of Digital Stippling
+journal: Elsevier, Computers & Graphics
+volume: 67
+pp1: 24
+pp2: 44
+year: 2017
+)
+---
+(
+authors: Alejandro Rodríguez, Alejandro León, Germán Arroyo
+title: Parallel deformation of heterogeneous ChainMail models: Application to interactive deformation of large medical volumes
+journal: Computers in Biology and Medicine
+volume: 79
+pp1: 222
+pp2: 232
+month: December
+year: 2016
+doi: 10.1016/j.compbiomed.2016.10.012
+)

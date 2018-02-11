@@ -1,0 +1,5 @@
+\noindent\textbf{$title}, \emph{$authors}, $journal, pp. $pp1--$pp2, $volume, $month, \textbf{$year}, doi:\underline{$doi} \newline
+
+
+
+

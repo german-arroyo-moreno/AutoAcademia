@@ -1,0 +1,4 @@
+<p><b>$title</b>, <i>$authors</i>, $journal, pp. $pp1-$pp2, $volume, $month, <b>$year</b>, doi:<u>$doi</u></p>
+</br>
+
+
