@@ -1,4 +1,4 @@
-#AutoAcademia
+# AutoAcademia
 
 *Have you ever despaired of filling hundreds of resumes by copying the list of publications and projects over and over again?*
 
