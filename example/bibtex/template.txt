@@ -1,0 +1,8 @@
+@article{$idtex, 
+author = {$authors}, 
+title = {$title}, 
+journal = {$journal}, 
+pages = {$pp1--$pp2},
+volume = {$volume},
+year = {$year}, 
+} 

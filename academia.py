@@ -3,9 +3,7 @@
 
 """
 
-Copyright 2018
-
-Author: Germán Arroyo
+Copyright 2018 (c) Germán Arroyo
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -49,6 +47,9 @@ parser.add_argument("--reverse-sort-by",
 parser.add_argument("--filter-by",
                     help="Filter the output to that works that fulfill the given expression.",
                     type=str)
+parser.add_argument("-mod", "--module",
+                    help="Load a given file as a module that is executed in python as a function that return a dictionary, a work. The only parameters of the function are: a dictionary (work), its index in the list (index_work), and the complete list (works)..",
+                    type=str)
 
 
 args = parser.parse_args()
@@ -61,6 +62,9 @@ else:
 p = Parser(mode=args.mode, token_list=token_list, colors=args.colors)
 
 p.parse(args.text_file,filterby=args.filter_by)
+
+if args.module is not None:
+    p.execMod(args.module)
 
 if args.sort_by is not None or args.reverse_sort_by is not None:
     if args.reverse_sort_by is not None:
