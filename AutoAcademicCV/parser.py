@@ -4,6 +4,7 @@ from .textfile import openFile
 from .latexencode import utf8tolatex
 import sys
 import re
+from operator import attrgetter
 
 class Parser:
     """ Class to automatic format elements in an academic CV, such as
@@ -23,7 +24,8 @@ class Parser:
         """
         self._mode = mode
         self.works = []
-        self.reg = {}
+        self.reg = {} # rules of regular expressions
+        self.regPrior = [] # priority of the rules
 
         if colors:
             self._err = '\033[91mError\033[0m'
@@ -34,11 +36,21 @@ class Parser:
 
         if len(token_list) == 0:
             self._token_list = [
-                'idtex', 'authors', 'title', 'journal', 'book', 'proc', 'pp1', 'pp2',
+                'idtex', 'authors', 'title', 'journal', 'conference', 'book', 'proc', 'pp1', 'pp2',
                 'month', 'year', 'volume', 'number', 'doi', 'city', 'country'
             ]
         else:
             self._token_list = token_list
+
+    def sort(self, fields, reverse=False):
+        """
+        " Sort the works according to a field.
+        "
+        " fields : is the list of fields.
+        " reverse : if this field is True, the list is reversed.
+        """
+        self._sortFields = fields
+        self.works = sorted(self.works, key=self._sortFunc, reverse=reverse)
 
     def regularExpr(self, input_file):
         """
@@ -89,10 +101,12 @@ class Parser:
             # remove quotemarks:
             expr = expr[1:-1]
             repl = repl[1:-1]
+            self.regPrior.append(token)
             self.reg[token] = [expr, repl]
             print("    New rule added: " + token + " := [" + expr + "] --> [" + repl + "]")
         print("")
         return
+
 
     def template(self, template_text, header_text="", footer_text=""):
         """
@@ -115,31 +129,41 @@ class Parser:
         text = ""
         for work in self.works:
             ctemplate = template_text
-            for field in work:
-                if work[field] is None:
-                    new_text = ""
-                else:
-                    new_text = work[field]
-                ctemplate = ctemplate.replace("$" + field, new_text)
+            prev_template = ctemplate
+            change = True
+            iteration = 0
+            while change:
+                iteration += 1
+                # replace the template until no more changes can be done
+                for field in work:
+                    if work[field] is not None:
+                        ctemplate = ctemplate.replace("$" + field, work[field])
+                        # ctemplate has the previous
+                # apply replacing rules
+                print("   Rules iteration: " + str(iteration))
+                for token in self.regPrior:
+                    expr, rep = self.reg[token]
+                    prev = len(ctemplate)
+                    ctemplate = re.sub(r"" + expr, rep, ctemplate)
+                    char_changed = len(ctemplate) - prev
+                    if char_changed == 0:
+                        print (self._msg("Rule [" + token + "] didn't change anything!",
+                                         ttype="warning", indent=4))
+                    else:
+                        print("    Rule [" + token +
+                              "] applied, " + str(char_changed)  + " characters changed.")
+                # check if some change is produced
+                change = ctemplate != prev_template
+                prev_template = ctemplate
             text += ctemplate
-        # Apply regular expressions
-        for token in self.reg:
-            expr, rep = self.reg[token]
-            prev = len(text)
-            text = re.sub(r"" + expr, rep, text)
-            char_changed = len(text) - prev
-            if char_changed == 0:
-                print (self._msg("Rule [" + token + "] didn't change anything!",
-                                 ttype="warning", indent=4))
-            else:
-                print("    Rule [" + token +
-                      "] applied, " + str(char_changed)  + " characters changed.")
+
         # Remove unused tokens:
         for field in self._token_list:
             text = text.replace("$" + field, "")
         return str(header_text) + text + str(footer_text)
 
-    def parse(self, input_file):
+
+    def parse(self, input_file, filterby=None):
         """
         " Parse a text file:
         " input_file : a valid file with tokens and value follwing the specified format
@@ -186,11 +210,28 @@ class Parser:
                         sys.exit(1)
                     else: # append paper to list ***
                         stage = ')'
-                        self.works.append(current_work)
+                        if filterby is None:
+                            self.works.append(current_work)
+                        else: # a filter is applied
+                            variable = re.findall(r"\$\b\w+\b", filterby)
+                            if len(variable) > 0:
+                                variable = variable[0]
+                            if len(variable) > 0:
+                                filterby = re.sub(r"\$" + variable[1:],
+                                                  "current_work['" + variable[1:] + "']",
+                                                  filterby)
+                            try:
+                                if eval(filterby):
+                                    self.works.append(current_work)
+                            except:
+                                print (self._msg(" current work " + str(current_work) +
+                                                 " filtered by filter '" + filterby + "'.",
+                                                 filename=input_file,
+                                                 line=line, ttype="warning", indent=4))
                 else:   # ignore strange lines
                     print (self._msg("strange field '" + str(fields) +
                                      "'. This work was not properly open.",
-                                     line=line, ttype="warning", indent=4))
+                                     line=line, filename=input_file, ttype="warning", indent=4))
                     continue
             elif self._parse_field(fields, line, token_list,
                                    input_file):
@@ -225,6 +266,7 @@ class Parser:
         else:
             return True
 
+
     def _msg(self, msg, indent=0, ttype="other", line=None, filename=None):
         """
         " Display a message of error or warning:
@@ -247,3 +289,25 @@ class Parser:
             text += ": "
         text += msg
         return text
+
+
+    def _sortFunc(self, dictobj):
+        """
+        "
+        """
+        text = ""
+
+        for f in self._sortFields:
+            try:
+                data = dictobj[f]
+                if type(f) == int:
+                    text += "%020d " % data
+                else:
+                    text += " " + str(data)
+            except:
+                print (self._msg("argument '" + f + "' doesn't exist in " +
+                                 str(dictobj) + " when sorting!",
+                                 ttype="warning", indent=4))
+
+        return text
+

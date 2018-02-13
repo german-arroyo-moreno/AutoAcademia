@@ -1,5 +1,33 @@
 ---
 
+(
+authors: Luis López, Juan Carlos Torres, Germán Arroyo
+title: Measuring Surface Roughness on Cultural Heritage 3D models
+conference: CEIG - Spanish Computer Graphics Conference
+year: 2013
+city: Madrid
+country: Spain
+)
+
+(
+authors: Germán Arroyo, Alejandro Rodríguez, Juan Carlos Torres
+title: A Study of Octocopters for 3D Digitalization from Photographs in Areas of Difficult Access
+conference: CEIG - Spanish Computer Graphics Conference
+year: 2013
+city: Madrid
+country: Spain
+)
+
+(
+authors: Juan Carlos Torres, Luis Lopez, Celia Romo, Germán Arroyo, Pedro Cano, Francisco Lamolda, María del Mar Villafranca
+title: Using a Cultural Heritage Information System for the documentation of the restoration process
+conference: Digital Heritage 2013
+year: 2013
+city: Marselle
+country: France 
+doi: 10.1109/DigitalHeritage.2013.6744761
+)
+
 -- this is a comment
 (
 authors: Domingo Martín, Germán Arroyo, Alejandro Rodríguez, Tobias Isenberg

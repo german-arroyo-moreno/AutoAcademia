@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-""" Author: Germán Arroyo """
+"""
 
-""" Esta herramienta permite convertir desde un formato simple en txt
-a bibtex, o a latex. """
+Copyright 2018
 
-# Note that:
-# After you run bibtex, you can copy the contents of the .bbl
-# file into your document.
+Author: Germán Arroyo
 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+"""
 
 import argparse,sys
 
@@ -36,6 +40,16 @@ parser.add_argument("-o", "--output", help="An output file.", type=str)
 parser.add_argument("-m", "--mode", help="Replacement mode.",
                     choices=["plain", "tex"])
 parser.add_argument("-c", "--colors", help="For terminals with colors.", action="store_true")
+parser.add_argument("--sort-by",
+                    help="Sort the works following a list of fields separated by comma ','",
+                    type=str)
+parser.add_argument("--reverse-sort-by",
+                    help="Sort the works following a list of fields separated by comma ',' in reverse order.",
+                    type=str)
+parser.add_argument("--filter-by",
+                    help="Filter the output to that works that fulfill the given expression.",
+                    type=str)
+
 
 args = parser.parse_args()
 
@@ -45,7 +59,19 @@ else:
     token_list = []
 
 p = Parser(mode=args.mode, token_list=token_list, colors=args.colors)
-p.parse(args.text_file)
+
+p.parse(args.text_file,filterby=args.filter_by)
+
+if args.sort_by is not None or args.reverse_sort_by is not None:
+    if args.reverse_sort_by is not None:
+        raw_fields = args.reverse_sort_by.split(",")
+        rev = True
+    else:
+        rev = False
+        raw_fields = args.sort_by.split(",")
+    fields = []
+    [fields.append(f.strip()) for f in raw_fields]
+    p.sort(fields, rev)
 
 if args.preReRules is not None:
     p.regularExpr(args.preReRules)

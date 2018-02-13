@@ -2,3 +2,7 @@
 remove_month :: ",\s*\$month"
 -- eliminate the empty doi with some html format
 remove_doi :: ",\s*doi:<u>\$doi</u>"
+
+-- if it is not a journal then it is a conference:
+replace_journal_by_conference :: ",\s*\$journal" :: ", In Proceedings of $conference"
+
