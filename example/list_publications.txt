@@ -24,7 +24,7 @@ title: Using a Cultural Heritage Information System for the documentation of the
 conference: Digital Heritage 2013
 year: 2013
 city: Marselle
-country: France 
+country: France
 doi: 10.1109/DigitalHeritage.2013.6744761
 )
 
@@ -37,6 +37,13 @@ volume: 67
 pp1: 24
 pp2: 44
 year: 2017
+abstract: In this article we survey techniques for the digital simulation of hand-made stippling—one of the core techniques developed within non-photorealistic/expressive rendering. Over the years, a plethora of automatic or semi-automatic stippling algorithms have been proposed.
+
+ As part of this expanding field of research, techniques have been developed that not only push the boundaries of traditional stippling but that also relate to other processes or techniques.
+ Our general goal in this survey is thus to increase our understanding of both hand-made and computer-assisted stippling.
+
+ For this purpose we not only provide an overview of the work on digital stippling but also examine its relationship to traditional stippling and to related fields such as halftoning. Finally, we propose several directions of future work in the field.
+ 
 )
 ---
 (

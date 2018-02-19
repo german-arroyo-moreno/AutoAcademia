@@ -16,7 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 from .textfile import openFile
 from .textfile import openLinesTxtFile
 from .latexencode import utf8tolatex
-import sys
+import sys, os
 import re
 from operator import attrgetter
 
@@ -52,7 +52,7 @@ class Parser:
         if len(token_list) == 0:
             self._token_list = [
                 'idtex', 'authors', 'title', 'journal', 'conference', 'book', 'proc', 'pp1', 'pp2',
-                'month', 'year', 'volume', 'number', 'doi', 'city', 'country'
+                'month', 'year', 'volume', 'number', 'doi', 'city', 'country', 'abstract'
             ]
         else:
             self._token_list = token_list
@@ -227,6 +227,7 @@ class Parser:
         stage = ")"
         line = 0
         current_work = {}
+        last_field = None
         for tline in finput:
             line += 1
             # remove white spaces, both sides of the string
@@ -237,26 +238,38 @@ class Parser:
                  (len(tline) >= 2 and tline[0] == '-' and tline[1] == '-') ):
                 continue # ignore comments starting by --
 
-            fields = tline.split(":", 1) # only the first time
+            if tline in ['\n', '\r\n']:
+                continue # ignore empty lines
 
-            if len(fields) < 2:
+            fields = tline.split(":", 1) # only the first time
+            if len(fields) == 1 and fields[0] != '(' and fields[0] != ')':
+                if last_field is None:
+                    print (self._msg("missing previous field.",
+                                     line=line, ttype="error", indent=4,
+                                     filename=input_file))
+                    sys.exit(1)
+                else:
+                    current_work[last_field] += os.linesep + tline
+            elif len(fields) < 2:
                 if fields[0] == '(':
                     if stage == '(':
                         print (self._msg("missing ')'. Last work was not properly closed.",
                                          line=(line-1), ttype="error", indent=4,
                                          filename=input_file))
-                        sys.exit(1)
+                        sys.exit(2)
                     else: # new work ****
                         stage = '('
                         current_work = {}
+                        last_field = None
                 elif fields[0] == ')':
                     if stage == ')':
                         print (self._msg("missing '('. This work was not properly open.",
                                          line=(line-1), ttype="error", indent=4,
                                          filename=input_file))
-                        sys.exit(1)
+                        sys.exit(3)
                     else: # append paper to list ***
                         stage = ')'
+                        last_field = None
                         if filterby is None:
                             self.works.append(current_work)
                         else: # a filter is applied
@@ -270,6 +283,7 @@ class Parser:
                             try:
                                 if eval(filterby):
                                     self.works.append(current_work)
+
                             except:
                                 print (self._msg(" current work " + str(current_work) +
                                                  " filtered by filter '" + filterby + "'.",
@@ -286,20 +300,21 @@ class Parser:
                     print (self._msg("missing '('. This work was not properly open.",
                                      line=line, ttype="error", indent=4,
                                      filename=input_file))
-                    sys.exit(1)
+                    sys.exit(2)
                 # Add field to current work:
                 text = fields[1].strip()
                 # Apply modes if any:
                 if self._mode == "tex":
                     text = utf8tolatex(text)
                 current_work[fields[0].strip()] = text
+                last_field = fields[0].strip()
 
 
         if stage == '(':
             print (self._msg("missing ')'. Last work was not properly closed.",
                              line=(line-1), ttype="error", indent=4,
                              filename=input_file))
-            sys.exit(1)
+            sys.exit(3)
         finput.close()
 
 
