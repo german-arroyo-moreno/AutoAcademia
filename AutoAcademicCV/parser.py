@@ -308,6 +308,12 @@ class Parser:
                     text = utf8tolatex(text)
                 current_work[fields[0].strip()] = text
                 last_field = fields[0].strip()
+            else: # unknown field
+                if self._mode == "tex":
+                    text = utf8tolatex(tline)
+                else:
+                    text = tline
+                current_work[last_field] += text
 
 
         if stage == '(':
@@ -320,10 +326,16 @@ class Parser:
 
     def _parse_field(self, fields, line, token_list, filename):
         """ Parse a field and its value, line is used for errors """
+        # a field cannot start by space or tab
+        if ((fields[0][0] == "\t") or (fields[0][0])) == " ":
+            return False # additional line
+
         if fields[0] not in token_list:
-            print (self._msg("unknown token '" + fields[0] + "'. Recogniced tokens are:",
-                             indent=3, ttype="warning"))
-            print (self._msg(str(sorted(token_list)), indent=5, filename=filename))
+            print("'" + fields[0] + "'")
+            print(fields)
+            #            print (self._msg("unknown token '" + fields[0] + "'. Recogniced tokens are:",
+            #                             indent=3, ttype="warning"))
+            #            print (self._msg(str(sorted(token_list)), indent=5, filename=filename))
             return False
         else:
             return True
