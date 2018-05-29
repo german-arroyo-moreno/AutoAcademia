@@ -231,6 +231,7 @@ class Parser:
         for tline in finput:
             line += 1
             # remove white spaces, both sides of the string
+            prev_tline = tline
             tline = tline.strip()
 
             # ignore comments and blank lines
@@ -294,8 +295,9 @@ class Parser:
                                      "'. This work was not properly open.",
                                      line=line, filename=input_file, ttype="warning", indent=4))
                     continue
-            elif self._parse_field(fields, line, token_list,
-                                   input_file):
+            elif ( (prev_tline[0] != "\t") and (prev_tline[0] != " ") and
+                   (self._parse_field(fields, line, token_list,
+                                   input_file)) ):
                 if stage == ')':
                     print (self._msg("missing '('. This work was not properly open.",
                                      line=line, ttype="error", indent=4,
@@ -308,7 +310,7 @@ class Parser:
                     text = utf8tolatex(text)
                 current_work[fields[0].strip()] = text
                 last_field = fields[0].strip()
-            else: # unknown field
+            else: # unknown field, add text to the previous field
                 if self._mode == "tex":
                     text = utf8tolatex(tline)
                 else:
@@ -327,15 +329,10 @@ class Parser:
     def _parse_field(self, fields, line, token_list, filename):
         """ Parse a field and its value, line is used for errors """
         # a field cannot start by space or tab
-        if ((fields[0][0] == "\t") or (fields[0][0])) == " ":
-            return False # additional line
-
         if fields[0] not in token_list:
-            print("'" + fields[0] + "'")
-            print(fields)
-            #            print (self._msg("unknown token '" + fields[0] + "'. Recogniced tokens are:",
-            #                             indent=3, ttype="warning"))
-            #            print (self._msg(str(sorted(token_list)), indent=5, filename=filename))
+            print (self._msg("unknown token '" + fields[0] + "'. Recogniced tokens are:",
+                             indent=3, ttype="warning"))
+            print (self._msg(str(sorted(token_list)), indent=5, line=line,filename=filename))
             return False
         else:
             return True
